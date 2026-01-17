@@ -5,6 +5,8 @@ import psycopg
 app = Flask(__name__)
 print(__name__)
 
+def get_db_connection():
+    return psycopg.connect(os.environ[""])
 
 @app.route("/")
 def home():
