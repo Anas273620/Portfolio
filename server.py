@@ -3,10 +3,9 @@ import csv
 import os
 import psycopg
 app = Flask(__name__)
-print(__name__)
 
 def get_db_connection():
-    return psycopg.connect(os.environ[""])
+    return psycopg.connect(os.environ["DATABASE_URL"])
 
 @app.route("/submit_form", methods=["POST"])
 def submit_form():
