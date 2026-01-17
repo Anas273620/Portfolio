@@ -1,5 +1,4 @@
 from flask import Flask, render_template, url_for, request, redirect
-import csv
 import os
 import psycopg
 app = Flask(__name__)
@@ -9,9 +8,12 @@ def get_db_connection():
 
 @app.route("/submit_form", methods=["POST"])
 def submit_form():
-    email = request.form.get("email")
-    subject = request.form.get("subject")
-    message = request.form.get("message")
+    email = request.form.get("email", "").strip()
+    subject = request.form.get("subject", "").strip()
+    message = request.form.get("message", "").strip()
+
+    if not email or not message:
+        return "Email and message are required.", 400
 
     with get_db_connection() as conn:
         with conn.cursor() as cur:
@@ -21,8 +23,23 @@ def submit_form():
             )
             conn.commit()
 
-    return redirect(url_for("home"))
+    return redirect("/thankyou.html")
 
+def init_db():
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS contact_messages (
+                    id SERIAL PRIMARY KEY,
+                    email TEXT NOT NULL,
+                    subject TEXT,
+                    message TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            conn.commit()
+
+init_db()
 
 @app.route("/")
 def home():
