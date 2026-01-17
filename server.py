@@ -11,12 +11,7 @@ def home():
 @app.route("/<string:page_name>")
 def html_page(page_name):
     return render_template(page_name)
-
-@app.route("/favicon.ico")
-def favicon():
-    return "", 204
     
-
 def write_to_file(data):
     with open('database.txt', mode='a')as database:
         email = data['email']
