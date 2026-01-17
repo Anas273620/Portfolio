@@ -8,6 +8,19 @@ print(__name__)
 def get_db_connection():
     return psycopg.connect(os.environ[""])
 
+with get_db_connection() as conn:
+    with conn.cursor() as cur:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS contact_messages (
+                id SERIAL PRIMARY KEY,
+                email TEXT NOT NULL,
+                subject TEXT,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.commit()
+
 @app.route("/")
 def home():
     return render_template('index.html')
