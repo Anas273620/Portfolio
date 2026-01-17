@@ -8,18 +8,22 @@ print(__name__)
 def get_db_connection():
     return psycopg.connect(os.environ[""])
 
-with get_db_connection() as conn:
-    with conn.cursor() as cur:
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS contact_messages (
-                id SERIAL PRIMARY KEY,
-                email TEXT NOT NULL,
-                subject TEXT,
-                message TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+@app.route("/submit_form", methods=["POST"])
+def submit_form():
+    email = request.form.get("email")
+    subject = request.form.get("subject")
+    message = request.form.get("message")
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO contact_messages (email, subject, message) VALUES (%s, %s, %s)",
+                (email, subject, message)
             )
-        """)
-        conn.commit()
+            conn.commit()
+
+    return redirect(url_for("home"))
+
 
 @app.route("/")
 def home():
